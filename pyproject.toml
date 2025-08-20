@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "treeclick"
+version = "0.1.0"
+description = "A Click extension for tree-formatted help"
+requires-python = ">=3.8"
+dependencies = [
+    "click",
+    "rich",
+]
+
+[project.scripts]
+treeclick = "treeclick.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
