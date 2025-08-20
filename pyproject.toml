@@ -10,7 +10,8 @@ requires-python = ">=3.8"
 dependencies = [
     "click",
     "rich",
-    "ruff"
+    "ruff",
+    "pytest"
 ]
 
 [tool.setuptools.packages.find]
