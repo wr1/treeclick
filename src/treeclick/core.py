@@ -103,7 +103,6 @@ class TreeGroup(click.Group):
 
 def format_tree_help(ctx, is_group, use_tree=True, max_width=None):
     """Format the help in tree style or indented."""
-    connector_width = 4
     out = StringIO()
     term_width = max_width or ctx.terminal_width or 80
     term_console = Console(
