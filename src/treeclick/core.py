@@ -118,14 +118,14 @@ def format_tree_help(ctx, is_group):
 
     # Usage
     if is_group:
-        usage_parts = " [OPTIONS] COMMAND [ARGS]..."
+        usage_parts = "[OPTIONS] COMMAND [ARGS]..."
     else:
         args_part = " ".join(
             f"[[orange1]{p.name.upper()}[/orange1]]"
             for p in ctx.command.params
             if isinstance(p, click.Argument)
         )
-        usage_parts = " [OPTIONS]" + (f" {args_part}" if args_part else "")
+        usage_parts = "[OPTIONS]" + (f" {args_part}" if args_part else "")
     term_console.print(
         f"\n[bold]Usage:[/bold] {ctx.command_path} {Text.from_markup(usage_parts)}\n"
     )
