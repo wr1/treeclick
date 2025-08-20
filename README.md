@@ -1,3 +1,4 @@
+![Deploy](https://github.com/wr1/treeclick/actions/workflows/ci.yml/badge.svg)![Version](https://img.shields.io/github/v/release/wr1/treeclick)
 # TreeClick
 
 A Click extension that provides tree-formatted help messages for CLI commands and groups.
@@ -42,6 +43,8 @@ if __name__ == "__main__":
 Running `python mycli.py --help` will display a tree-formatted (or indented) help message consistently.
 
 For a more complex example, see `examples/demo.py`.
+
+![image](docs/assets/image.png)
 
 ## Features
 
