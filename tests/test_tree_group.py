@@ -1,3 +1,4 @@
+import re
 import click
 from click.testing import CliRunner
 from treeclick import TreeGroup, TreeCommand
@@ -13,7 +14,7 @@ def test_custom_help():
         click.echo(message)
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["--help"])
+    result = runner.invoke(cli, ["--help"], color=True, prog_name="test")
     assert result.exit_code == 0
     assert "Usage:" in result.output
     assert "Commands:" in result.output
@@ -29,7 +30,97 @@ def test_no_args_help():
         click.echo(message)
 
     runner = CliRunner()
-    result = runner.invoke(cli, [])
+    result = runner.invoke(cli, [], color=True, prog_name="test")
     assert result.exit_code == 0
     assert "Usage:" in result.output
     assert "Commands:" in result.output
+
+
+def test_subcommand_help_formatting():
+    """Test help formatting for subcommand, including dimming and line wrapping."""
+    cli = TreeGroup(
+        name="test",
+        help="This is a test CLI with a long description that should wrap properly in the output.",
+    )
+
+    subgroup = TreeGroup(
+        name="sub", help="Subgroup with long help text that needs wrapping."
+    )
+    cli.add_command(subgroup)
+
+    @subgroup.command(name="cmd", cls=TreeCommand)
+    @click.option(
+        "--opt",
+        "-o",
+        help="Option with very long help text that should wrap correctly and not dim since it's current.",
+    )
+    def cmd(opt):
+        pass
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["sub", "cmd", "--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    output = re.sub(r"\x1b\[\d+m", "", result.output)  # Strip ANSI codes for assertion
+    assert "Usage: test sub cmd [OPTIONS]" in output
+    assert "Description: " in output
+    assert "Options:" in output
+    assert "--opt, -o" in output
+    assert "Commands:" in output
+    assert "test" in output  # Root
+    assert "sub" in output  # Subgroup
+    assert "cmd" in output  # Command
+
+    # Check for dimming (though hard to assert directly, ensure structure)
+    assert "This is a test CLI with a long description" in output
+    assert "Option with very long help text" in output
+
+
+def test_line_wrapping_in_help():
+    """Test line wrapping in help text."""
+    cli = TreeGroup(
+        name="test",
+        help="Long help text that should wrap across multiple lines without failing indentation.",
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    output = result.output
+    assert "Long help text that should wrap" in output
+    # Ensure no failed wrapping (e.g., check for unexpected line breaks)
+    assert re.search(r"wrap\s+across", output) is not None
+
+
+def test_options_in_tree():
+    """Test that options are included in the tree view for the current command."""
+    cli = TreeGroup(name="test", help="Test CLI")
+
+    @cli.command(name="cmd", cls=TreeCommand)
+    @click.option("--opt", help="Test option")
+    def cmd(opt):
+        pass
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["cmd", "--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    output = re.sub(r"\x1b\[\d+m", "", result.output)
+    assert "--opt" in output
+    assert "Test option" in output
+
+
+def test_dimming_higher_levels():
+    """Test dimming of higher hierarchical levels."""
+    cli = TreeGroup(name="test", help="Root help")
+
+    subgroup = TreeGroup(name="sub", help="Sub help")
+    cli.add_command(subgroup)
+
+    @subgroup.command(name="cmd", cls=TreeCommand)
+    def cmd():
+        pass
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["sub", "cmd", "--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    # Since dimming uses ANSI, check for presence of dim style codes
+    assert "\x1b[2m" in result.output  # Dim style code
