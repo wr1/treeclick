@@ -6,6 +6,7 @@ from io import StringIO
 from rich.console import Console
 from rich.tree import Tree
 from rich.text import Text
+from .strip_tree_guides import strip_tree_guides
 
 console = Console()
 
@@ -13,13 +14,11 @@ console = Console()
 class TreeCommand(click.Command):
     """Custom Command with tree-formatted help."""
 
-    def __init__(
-        self, *args, use_tree=True, max_width=None, connector_width=3, **kwargs
-    ):
+    def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
-        self.connector_width = connector_width if connector_width in [2, 3] else 3
+        self.connector_width = 4
         self.no_args_is_help = True
         self.params.append(
             click.Option(
@@ -41,26 +40,22 @@ class TreeCommand(click.Command):
         config = ctx.obj.get("treeclick_config", {}) if ctx.obj else {}
         use_tree = config.get("use_tree", self.use_tree)
         max_width = config.get("max_width", self.max_width)
-        connector_width = config.get("connector_width", self.connector_width)
         return format_tree_help(
             ctx,
             is_group=False,
             use_tree=use_tree,
             max_width=max_width,
-            connector_width=connector_width,
         )
 
 
 class TreeGroup(click.Group):
     """Custom Group with tree-formatted help."""
 
-    def __init__(
-        self, *args, use_tree=True, max_width=None, connector_width=3, **kwargs
-    ):
+    def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
-        self.connector_width = connector_width if connector_width in [2, 3] else 3
+        self.connector_width = 4
         self.no_args_is_help = True
         self.params.append(
             click.Option(
@@ -84,14 +79,31 @@ class TreeGroup(click.Group):
             is_group=True,
             use_tree=self.use_tree,
             max_width=self.max_width,
-            connector_width=self.connector_width,
         )
 
+    def add_command(self, cmd, name=None):
+        name = name or cmd.name
+        super().add_command(cmd, name)
+        if isinstance(cmd, (TreeGroup, TreeCommand)):
+            cmd.use_tree = self.use_tree
+            cmd.max_width = self.max_width
 
-def format_tree_help(ctx, is_group, use_tree=True, max_width=None, connector_width=3):
+    def command(self, *args, **kwargs):
+        def decorator(f):
+            cmd = super().command(*args, **kwargs)(f)
+            if isinstance(cmd, (TreeGroup, TreeCommand)):
+                cmd.use_tree = self.use_tree
+                cmd.max_width = self.max_width
+            return cmd
+
+        return decorator
+
+
+def format_tree_help(ctx, is_group, use_tree=True, max_width=None):
     """Format the help in tree style or indented."""
+    connector_width = 4
     out = StringIO()
-    term_width = max_width or ctx.terminal_width or 120
+    term_width = max_width or ctx.terminal_width or 80
     term_console = Console(
         file=out, width=term_width, color_system="auto", force_terminal=True
     )
@@ -155,7 +167,20 @@ def format_tree_help(ctx, is_group, use_tree=True, max_width=None, connector_wid
     )
 
     # Description
-    term_console.print(f"[bold]Description:[/bold] {ctx.command.help or ''}\n")
+    help_text_str = ctx.command.help or ""
+    desc_label = Text.from_markup("[bold]Description:[/bold] ")
+    term_console.print(desc_label, end="")
+    if help_text_str:
+        desc_start = term_console.measure(desc_label).maximum
+        available_width = term_width - desc_start
+        if available_width < 10:
+            available_width = term_width // 2
+        lines = textwrap.wrap(help_text_str, width=available_width)
+        term_console.print(lines[0])
+        for line in lines[1:]:
+            term_console.print(" " * desc_start + line)
+    else:
+        term_console.print()
 
     # Current options
     current_option_effectives = []
@@ -288,29 +313,11 @@ def format_tree_help(ctx, is_group, use_tree=True, max_width=None, connector_wid
         )
         temp_console.print(tree)
         rendered = temp_out.getvalue()
-        stripped = strip_tree_guides(rendered, connector_width)
+        stripped = strip_tree_guides(rendered)
         term_console.print(Text.from_ansi(stripped), end="")
 
     term_console.print()
     return out.getvalue()
-
-
-def strip_tree_guides(text, connector_width):
-    """Replace tree guides with spaces or custom width connectors."""
-    # For concealed, replace with spaces of connector_width +1 (for space)
-    space_connector = " " * (connector_width + 1)
-    lines = text.splitlines()
-    for i in range(len(lines)):
-        line = lines[i]
-        line = line.replace("├── ", space_connector)
-        line = line.replace("└── ", space_connector)
-        line = line.replace("│   ", space_connector)
-        if connector_width == 2:
-            line = line.replace("├─ ", "   ")
-            line = line.replace("└─ ", "   ")
-            line = line.replace("│  ", "   ")
-        lines[i] = line
-    return "\n".join(lines) + "\n"
 
 
 def collect_effective_lengths(
