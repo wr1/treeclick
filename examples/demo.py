@@ -1,13 +1,13 @@
 import click
 from treeclick import TreeGroup, TreeCommand
 
+
 # Define the CLI as TreeGroup with configuration
 cli = TreeGroup(
     name="demo",
     help="This CLI provides commands to handle various tasks with subcommands for specific actions.",
-    use_tree=False,
-    max_width=180,
-    # connector_width=4,
+    use_tree=True,
+    max_width=120,
 )
 
 # First subgroup (config propagated automatically)
