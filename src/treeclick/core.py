@@ -15,7 +15,7 @@ class TreeCommand(click.Command):
     """Custom Command with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, add_help_option=False, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
@@ -52,11 +52,10 @@ class TreeGroup(click.Group):
     """Custom Group with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, add_help_option=False, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
-        self.no_args_is_help = True
         self.params.append(
             click.Option(
                 ["--help", "-h"],
@@ -66,6 +65,13 @@ class TreeGroup(click.Group):
                 callback=self.print_custom_help,
             )
         )
+
+    def invoke(self, ctx):
+        args = ctx.protected_args + ctx.args
+        if not args:
+            click.echo(self.get_help(ctx), color=ctx.color)
+            ctx.exit()
+        return super().invoke(ctx)
 
     def print_custom_help(self, ctx, param, value):
         if not value or ctx.resilient_parsing:
