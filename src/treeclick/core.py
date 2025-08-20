@@ -9,8 +9,8 @@ from rich.text import Text
 console = Console()
 
 
-class CustomCommand(click.Command):
-    """Custom Command with tree-formatted help."""
+class TreeCommand(click.Command):
+    """Command with tree-formatted help."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,8 +35,8 @@ class CustomCommand(click.Command):
         return format_tree_help(ctx, is_group=False)
 
 
-class CustomGroup(click.Group):
-    """Custom Group with tree-formatted help."""
+class TreeGroup(click.Group):
+    """Group with tree-formatted help."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -143,7 +143,7 @@ def format_tree_help(ctx, is_group):
         for param in ctx.command.params:
             if isinstance(param, click.Option) and param.name != "help":
                 opts = ", ".join(param.opts)
-                left_text = Text.from_markup(f"[bold yellow]{opts}[/bold yellow]")
+                left_text = Text.from_codegen(f"[bold yellow]{opts}[/bold yellow]")
                 left_len = term_console.measure(left_text).maximum
                 pad = global_column - left_len
                 pad_text = Text(" " * pad)
