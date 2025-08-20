@@ -89,8 +89,10 @@ class TreeGroup(click.Group):
             cmd.max_width = self.max_width
 
     def command(self, *args, **kwargs):
+        parent_command = super().command
+
         def decorator(f):
-            cmd = super().command(*args, **kwargs)(f)
+            cmd = parent_command(*args, **kwargs)(f)
             if isinstance(cmd, (TreeGroup, TreeCommand)):
                 cmd.use_tree = self.use_tree
                 cmd.max_width = self.max_width
