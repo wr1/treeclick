@@ -2,6 +2,7 @@ import click
 import os
 import sys
 import textwrap
+from io import StringIO
 from rich.console import Console
 from rich.tree import Tree
 from rich.text import Text
@@ -66,7 +67,7 @@ def format_tree_help(ctx, is_group):
     out = StringIO()
     term_console = Console(
         file=out,
-        width=ctx.terminal_width or 80,
+        width=ctx.terminal_width or 110,
         color_system="auto",
         force_terminal=True,
     )
@@ -122,11 +123,14 @@ def format_tree_help(ctx, is_group):
         usage_parts = " [OPTIONS] " + " ".join(
             f"[[orange1]{p.name.upper()}[/orange1]]"
             for p in ctx.command.params
-            if isinstance(p, click.Argument)
+            if isinstance(param, click.Argument)
         )
     term_console.print(
         f"\n[bold]Usage:[/bold] {ctx.command_path} {Text.from_markup(usage_parts)}\n"
     )
+
+    # Description
+    term_console.print(f"[bold]Description:[/bold] {ctx.command.help or ''}\n")
 
     # Current options
     current_option_effectives = []
@@ -167,9 +171,6 @@ def format_tree_help(ctx, is_group):
                         option_label.append(line, style="italic yellow")
                 term_console.print(option_label)
         term_console.print()
-
-    # Description
-    term_console.print(f"[bold]Description:[/bold] {ctx.command.help or ''}\n")
 
     # Commands
     term_console.print("[bold]Commands:[/bold]")
@@ -465,18 +466,17 @@ def add_to_tree(
                         dim_line.stylize("dim")
                         label.append_text(dim_line)
             cmd_branch = branch.add(label)
-            if not is_current:
-                for param in cmd.params:
-                    if isinstance(param, click.Option) and param.name != "help":
-                        add_option_branch(
-                            cmd_branch,
-                            param,
-                            level,
-                            global_column,
-                            indent_size,
-                            console,
-                            dim=True,
-                        )
+            for param in cmd.params:
+                if isinstance(param, click.Option) and param.name != "help":
+                    add_option_branch(
+                        cmd_branch,
+                        param,
+                        level,
+                        global_column,
+                        indent_size,
+                        console,
+                        dim=not is_current,
+                    )
             if isinstance(cmd, click.Group) and cmd.commands:
                 add_to_tree(
                     cmd_branch,
@@ -490,6 +490,3 @@ def add_to_tree(
                     is_top_level,
                     path_len,
                 )
-
-
-from io import StringIO
