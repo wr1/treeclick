@@ -199,4 +199,5 @@ def test_config_propagation():
     runner = CliRunner()
     result = runner.invoke(cli, ["sub", "--help"], color=True, prog_name="test")
     assert result.exit_code == 0
-    assert "Usage: test sub [OPTIONS] COMMAND [ARGS]..." in result.output
+    output = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
+    assert "Usage: test sub [OPTIONS] COMMAND [ARGS]..." in output
