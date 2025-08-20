@@ -22,14 +22,23 @@ user.add_command(manage)
 # Subcommand under manage (third layer)
 @click.command(name="set-role", cls=TreeCommand)
 @click.argument("role", type=str)
+@click.argument("user_id", type=str)
+@click.argument("reason", type=str)
 @click.option(
     "--user-id",
     "-u",
     help="User ID to set role for (unspecified if not provided) massively long yhammering on and on and on and one",
 )
-def set_role(role, user_id):
+@click.option(
+    "--reason",
+    "-r",
+    help="Reason for setting the role",
+)
+def set_role(role, user_id, reason):
     """Set a role for a user."""
     click.echo(f"Setting role {role} for user ID {user_id or 'unspecified'}")
+    if reason:
+        click.echo(f"Reason: {reason}")
 
 
 manage.add_command(set_role)
