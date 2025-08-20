@@ -139,3 +139,79 @@ def test_dimming_higher_levels():
     assert result.exit_code == 0
     # Since dimming uses ANSI, check for presence of dim style codes
     assert "\x1b[2m" in result.output  # Dim style code
+
+
+def test_indented_mode():
+    """Test indented mode without tree visualization."""
+    cli = TreeGroup(name="test", help="Test CLI", use_tree=False, connector_width=2)
+
+    @cli.command(name="echo", cls=TreeCommand)
+    @click.argument("message")
+    def echo(message):
+        click.echo(message)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    assert "-- " not in result.output  # Guides concealed
+    assert "echo" in result.output
+
+
+def test_custom_max_width():
+    """Test custom max_width for wrapping."""
+    cli = TreeGroup(
+        name="test",
+        help="Very long help text that should wrap at custom width.",
+        max_width=50,
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    output = re.sub(r"\x1b\[\d+m", "", result.output)
+    # Check if wrapped within 50 chars
+    help_lines = [
+        line
+        for line in output.split("\n")
+        if "Very long help text" in line or "should wrap at custom width" in line
+    ]
+    for line in help_lines:
+        assert len(line.strip()) <= 50
+
+
+def test_connector_width_3():
+    """Test connector width of 3 in indented mode."""
+    cli = TreeGroup(name="test", use_tree=False, connector_width=3)
+
+    @cli.command(name="cmd", cls=TreeCommand)
+    def cmd():
+        pass
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    assert "--- " not in result.output  # Guides concealed
+
+
+def test_config_propagation():
+    """Test configuration propagation to subgroups."""
+    cli = TreeGroup(
+        name="test", help="Root", use_tree=False, max_width=60, connector_width=2
+    )
+
+    subgroup = TreeGroup(name="sub", help="Sub")
+    cli.add_command(subgroup)
+
+    @subgroup.command(name="cmd", cls=TreeCommand)
+    def cmd():
+        pass
+
+    # Check if config propagated
+    assert subgroup.use_tree == False
+    assert subgroup.max_width == 60
+    assert subgroup.connector_width == 2
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["sub", "--help"], color=True, prog_name="test")
+    assert result.exit_code == 0
+    assert "Usage: test sub [OPTIONS] COMMAND [ARGS]..." in result.output
