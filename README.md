@@ -1,3 +1,4 @@
+![Deploy](https://github.com/wr1/treeclick/actions/workflows/ci.yml/badge.svg)![Version](https://img.shields.io/github/v/release/wr1/treeclick)
 # TreeClick
 
 A Click extension that provides tree-formatted help messages for CLI commands and groups.
