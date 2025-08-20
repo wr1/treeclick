@@ -183,9 +183,9 @@ def format_tree_help(ctx, is_group, use_tree=True, max_width=None):
         if available_width < 10:
             available_width = term_width // 2
         lines = textwrap.wrap(help_text_str, width=available_width)
-        term_console.print(lines[0])
+        term_console.print(Text(lines[0], style="bold"))
         for line in lines[1:]:
-            term_console.print(" " * desc_start + line)
+            term_console.print(Text(" " * desc_start + line, style="bold"))
     else:
         term_console.print()
 
@@ -257,12 +257,12 @@ def format_tree_help(ctx, is_group, use_tree=True, max_width=None):
         label.append_text(left_text)
         label.append_text(pad_text)
         if lines:
-            label.append(lines[0])
+            label.append(lines[0], style="bold")
             for line in lines[1:]:
                 label.append("\n")
                 indent_text = Text(" " * help_start_relative)
                 label.append_text(indent_text)
-                label.append(line)
+                label.append(line, style="bold")
     else:
         dim_left = left_text.copy()
         dim_left.stylize("dim")
@@ -456,12 +456,12 @@ def add_to_tree(
             label.append_text(left_text)
             label.append_text(pad_text)
             if lines:
-                label.append(lines[0])
+                label.append(lines[0], style="bold")
                 for line in lines[1:]:
                     label.append("\n")
                     indent_text = Text(" " * help_start_relative)
                     label.append_text(indent_text)
-                    label.append(line)
+                    label.append(line, style="bold")
             cmd_branch = branch.add(label)
             for param in cmd.params:
                 if isinstance(param, click.Option) and param.name != "help":
@@ -510,12 +510,12 @@ def add_to_tree(
                 label.append_text(left_text)
                 label.append_text(pad_text)
                 if lines:
-                    label.append(lines[0])
+                    label.append(lines[0], style="bold")
                     for line in lines[1:]:
                         label.append("\n")
                         indent_text = Text(" " * help_start_relative)
                         label.append_text(indent_text)
-                        label.append(line)
+                        label.append(line, style="bold")
             else:
                 dim_left = left_text.copy()
                 dim_left.stylize("dim")
