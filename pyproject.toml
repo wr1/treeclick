@@ -12,9 +12,6 @@ dependencies = [
     "rich",
 ]
 
-[project.scripts]
-treeclick = "treeclick.cli:main"
-
 [tool.setuptools.packages.find]
 where = ["src"]
 
