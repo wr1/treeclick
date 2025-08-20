@@ -456,12 +456,12 @@ def add_to_tree(
             label.append_text(left_text)
             label.append_text(pad_text)
             if lines:
-                label.append(lines[0], style="bold")
+                label.append(lines[0])
                 for line in lines[1:]:
                     label.append("\n")
                     indent_text = Text(" " * help_start_relative)
                     label.append_text(indent_text)
-                    label.append(line, style="bold")
+                    label.append(line)
             cmd_branch = branch.add(label)
             for param in cmd.params:
                 if isinstance(param, click.Option) and param.name != "help":
