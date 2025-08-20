@@ -36,6 +36,8 @@ Running `python mycli.py --help` will display a tree-formatted help message.
 
 For a more complex example, see `examples/demo.py`.
 
+![screenshot](docs/assets/image.png)
+
 ## Features
 
 - Tree-structured help output using Rich.

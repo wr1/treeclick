@@ -22,7 +22,7 @@ user.add_command(manage)
 @click.option(
     "--user-id",
     "-u",
-    help="User ID to set role for (unspecified if not provided) massively long yhammering on and on and on and one",
+    help="User ID to set role for (unspecified if not provided) massively long yammering on and on and on to make it long and test the wrapping of lines in the help output",
 )
 def set_role(role, user_id):
     """Set a role for a user."""
