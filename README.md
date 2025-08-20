@@ -43,6 +43,8 @@ Running `python mycli.py --help` will display a tree-formatted (or indented) hel
 
 For a more complex example, see `examples/demo.py`.
 
+![image](docs/assets/image.png)
+
 ## Features
 
 - Tree-structured or indented help output using Rich.
