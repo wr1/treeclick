@@ -193,7 +193,7 @@ def test_config_propagation():
         pass
 
     # Check if config propagated
-    assert subgroup.use_tree == False
+    assert not subgroup.use_tree
     assert subgroup.max_width == 60
 
     runner = CliRunner()
