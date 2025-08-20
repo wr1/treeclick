@@ -67,7 +67,7 @@ def format_tree_help(ctx, is_group):
     out = StringIO()
     term_console = Console(
         file=out,
-        width=ctx.terminal_width or 110,
+        width=ctx.terminal_width or 80,
         color_system="auto",
         force_terminal=True,
     )
@@ -120,11 +120,12 @@ def format_tree_help(ctx, is_group):
     if is_group:
         usage_parts = " [OPTIONS] COMMAND [ARGS]..."
     else:
-        usage_parts = " [OPTIONS] " + " ".join(
+        args_part = " ".join(
             f"[[orange1]{p.name.upper()}[/orange1]]"
             for p in ctx.command.params
-            if isinstance(param, click.Argument)
+            if isinstance(p, click.Argument)
         )
+        usage_parts = " [OPTIONS]" + (f" {args_part}" if args_part else "")
     term_console.print(
         f"\n[bold]Usage:[/bold] {ctx.command_path} {Text.from_markup(usage_parts)}\n"
     )
