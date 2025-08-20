@@ -1,4 +1,5 @@
 import re
+import sys
 import click
 from click.testing import CliRunner
 from treeclick import TreeGroup, TreeCommand
@@ -58,7 +59,14 @@ def test_subcommand_help_formatting():
         pass
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["sub", "cmd", "--help"], color=True, prog_name="test")
+    original_argv = sys.argv
+    sys.argv = ["test"]
+    try:
+        result = runner.invoke(
+            cli, ["sub", "cmd", "--help"], color=True, prog_name="test"
+        )
+    finally:
+        sys.argv = original_argv
     assert result.exit_code == 0
     output = re.sub(r"\x1b\[\d+m", "", result.output)  # Strip ANSI codes for assertion
     assert "Usage: test sub cmd [OPTIONS]" in output
@@ -120,7 +128,14 @@ def test_dimming_higher_levels():
         pass
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["sub", "cmd", "--help"], color=True, prog_name="test")
+    original_argv = sys.argv
+    sys.argv = ["test"]
+    try:
+        result = runner.invoke(
+            cli, ["sub", "cmd", "--help"], color=True, prog_name="test"
+        )
+    finally:
+        sys.argv = original_argv
     assert result.exit_code == 0
     # Since dimming uses ANSI, check for presence of dim style codes
     assert "\x1b[2m" in result.output  # Dim style code
