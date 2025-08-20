@@ -38,12 +38,16 @@ class TreeCommand(click.Command):
         ctx.exit()
 
     def get_help(self, ctx):
+        config = ctx.obj.get("treeclick_config", {}) if ctx.obj else {}
+        use_tree = config.get("use_tree", self.use_tree)
+        max_width = config.get("max_width", self.max_width)
+        connector_width = config.get("connector_width", self.connector_width)
         return format_tree_help(
             ctx,
             is_group=False,
-            use_tree=self.use_tree,
-            max_width=self.max_width,
-            connector_width=self.connector_width,
+            use_tree=use_tree,
+            max_width=max_width,
+            connector_width=connector_width,
         )
 
 
