@@ -15,7 +15,7 @@ class TreeCommand(click.Command):
     """Custom Command with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, add_help_option=False, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
@@ -52,7 +52,7 @@ class TreeGroup(click.Group):
     """Custom Group with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, add_help_option=False, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
