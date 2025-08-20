@@ -1,13 +1,16 @@
 import click
 from treeclick import TreeGroup, TreeCommand
 
-# Define the CLI as TreeGroup
+# Define the CLI as TreeGroup with configuration
 cli = TreeGroup(
     name="demo",
     help="This CLI provides commands to handle various tasks with subcommands for specific actions.",
+    use_tree=False,
+    max_width=180,
+    # connector_width=4,
 )
 
-# First subgroup
+# First subgroup (config propagated automatically)
 user = TreeGroup(name="user", help="Manage user-related operations.")
 cli.add_command(user)
 
@@ -22,7 +25,7 @@ user.add_command(manage)
 @click.option(
     "--user-id",
     "-u",
-    help="User ID to set role for (unspecified if not provided) massively long yammering on and on and on to make it long and test the wrapping of lines in the help output",
+    help="User ID to set role for (unspecified if not provided) massively long yhammering on and on and on and one",
 )
 def set_role(role, user_id):
     """Set a role for a user."""
