@@ -1,6 +1,6 @@
 # TreeClick
 
-A Click extension that provides tree-formatted help messages for CLI commands and groups.
+A Click extension that provides tree-formatted help messages for CLI commands and groups. Inspired by [rich-click](https://github.com/ewels/rich-click).
 
 ## Installation
 
