@@ -15,3 +15,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.pytest.ini_options]
+addopts = "-q --cov=treeclick --cov-report=term-missing --cov-report=html"
+
