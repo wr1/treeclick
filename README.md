@@ -1,7 +1,7 @@
 ![Deploy](https://github.com/wr1/treeclick/actions/workflows/ci.yml/badge.svg)![Version](https://img.shields.io/github/v/release/wr1/treeclick)
 # TreeClick
 
-A Click extension that provides tree-formatted help messages for CLI commands and groups.
+Tree view CLI help using click and rich, shows hierarchical overview of a CLI when using `--help`
 
 ## Installation
 
@@ -23,7 +23,7 @@ Configuration is set on the root `TreeGroup` and automatically propagated to sub
 import click
 from treeclick import TreeGroup, TreeCommand
 
-cli = TreeGroup(name="mycli", help="My CLI tool.", use_tree=True, max_width=100, connector_width=3)
+cli = TreeGroup(name="mycli", help="My CLI tool.")
 
 subgroup = TreeGroup(name="sub", help="Sub group")
 cli.add_command(subgroup)
@@ -44,7 +44,7 @@ Running `python mycli.py --help` will display a tree-formatted (or indented) hel
 
 For a more complex example, see `examples/demo.py`.
 
-![image](docs/assets/image.png)
+![image](docs/assets/use.gif)
 
 ## Features
 

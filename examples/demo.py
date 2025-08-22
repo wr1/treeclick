@@ -27,7 +27,7 @@ user.add_command(manage)
 @click.option(
     "--user-id",
     "-u",
-    help="User ID to set role for (unspecified if not provided) massively long yhammering on and on and on and one",
+    help="User ID to set role for (unspecified if not provided), where the help is really really long to test the wrapping of the lines in the CLI even if the terminal width is really wide it still tests it because it is just so very very long.",
 )
 @click.option(
     "--reason",
