@@ -15,11 +15,10 @@ class TreeCommand(click.Command):
     """Custom Command with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, no_args_is_help=False, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
-        self.no_args_is_help = True
 
     def get_help(self, ctx):
         config = ctx.obj.get("treeclick_config", {}) if ctx.obj else {}
@@ -37,11 +36,10 @@ class TreeGroup(click.Group):
     """Custom Group with tree-formatted help."""
 
     def __init__(self, *args, use_tree=True, max_width=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, no_args_is_help=True, **kwargs)
         self.use_tree = use_tree
         self.max_width = max_width
         self.connector_width = 4
-        self.no_args_is_help = True
 
     def get_help(self, ctx):
         return format_tree_help(
